@@ -1,121 +1,129 @@
 export default function Home() {
+  const stories = ["A", "B", "C", "D", "E", "F"];
+
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="text-center py-20 px-6">
-        <h1 className="text-6xl font-bold mb-4">PREMROG</h1>
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-          Global Social Media, Creator Economy & Advertising Platform
-        </p>
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-black border-b border-gray-800 p-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-blue-500">PREMROG</h1>
+        <div className="flex gap-4">
+          <span>🔔</span>
+          <span>💬</span>
+        </div>
+      </header>
 
-        <div className="mt-8 flex justify-center gap-4">
-          <button className="bg-blue-600 px-6 py-3 rounded-lg">
-            Get Started
-          </button>
-
-          <button className="border border-white px-6 py-3 rounded-lg">
-            Learn More
-          </button>
+      {/* Stories */}
+      <section className="p-4 overflow-x-auto">
+        <div className="flex gap-4">
+          {stories.map((item, index) => (
+            <div key={index} className="text-center">
+              <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center">
+                {item}
+              </div>
+              <p className="text-xs mt-1">Story</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 px-8">
-        <h2 className="text-4xl font-bold text-center mb-10">
-          Core Features
-        </h2>
+      {/* Feed */}
+      <section className="space-y-6 p-4">
+        {[1, 2, 3].map((post) => (
+          <div
+            key={post}
+            className="border border-gray-800 rounded-xl overflow-hidden"
+          >
+            <div className="p-3 flex justify-between">
+              <div>
+                <h3 className="font-bold">Creator {post}</h3>
+                <p className="text-xs text-gray-400">
+                  Monetized Creator
+                </p>
+              </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Photos</h3>
-            <p>Upload, Share & Monetize Photos.</p>
+              <button className="bg-blue-600 px-3 rounded">
+                Follow
+              </button>
+            </div>
+
+            <div className="h-72 bg-gray-800 flex items-center justify-center">
+              Photo / Reel Preview
+            </div>
+
+            <div className="p-3">
+              <div className="flex gap-4 text-xl">
+                <span>❤️</span>
+                <span>💬</span>
+                <span>📤</span>
+                <span>🔖</span>
+              </div>
+
+              <p className="mt-2 text-sm">
+                Premrog Creator Content Preview
+              </p>
+            </div>
           </div>
-
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Stories</h3>
-            <p>24 Hour Stories with Monetization.</p>
-          </div>
-
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Reels</h3>
-            <p>Short Videos & Creator Revenue.</p>
-          </div>
-
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Videos</h3>
-            <p>Long Form Content & Ad Revenue.</p>
-          </div>
-
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Movies</h3>
-            <p>Premium Movie Upload & Distribution.</p>
-          </div>
-
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">Chat & Calls</h3>
-            <p>P2P Chat, Audio Calls & Video Calls.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Monetization */}
-      <section className="py-16 px-8 bg-gray-900">
-        <h2 className="text-4xl font-bold text-center mb-10">
-          Creator Monetization
-        </h2>
-
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-lg">
-            Approved Creators can earn revenue through Ads.
-          </p>
-
-          <div className="mt-6 text-2xl font-bold">
-            75% Creator Revenue
-          </div>
-
-          <div className="text-xl mt-2">
-            25% Premrog Revenue
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Wallet */}
-      <section className="py-16 px-8">
-        <h2 className="text-4xl font-bold text-center mb-10">
-          Wallet System
-        </h2>
+      <section className="p-4">
+        <div className="bg-gray-900 rounded-xl p-4">
+          <h2 className="text-xl font-bold">Wallet</h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">
-              India Wallet
-            </h3>
-            <p>₹1 = 10 Coins</p>
-            <p>Minimum Recharge ₹10</p>
-          </div>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <div className="bg-black p-3 rounded">
+              <p>Coins</p>
+              <h3 className="text-2xl">100</h3>
+            </div>
 
-          <div className="border p-6 rounded-xl">
-            <h3 className="text-2xl font-bold mb-3">
-              International Wallet
-            </h3>
-            <p>$1 = 500 Coins</p>
-            <p>Minimum Recharge $1</p>
+            <div className="bg-black p-3 rounded">
+              <p>Cash Wallet</p>
+              <h3 className="text-2xl">₹0</h3>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-10 text-center">
-        <h3 className="text-2xl font-bold">Premrog</h3>
+      {/* Creator Dashboard Preview */}
+      <section className="p-4">
+        <div className="bg-gray-900 rounded-xl p-4">
+          <h2 className="text-xl font-bold">
+            Creator Dashboard
+          </h2>
 
-        <p className="mt-3 text-gray-400">
-          support.premrog@gmail.com
-        </p>
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="bg-black p-3 rounded">
+              Revenue ₹0
+            </div>
 
-        <p className="mt-2 text-gray-500">
-          © 2025 Premrog. All Rights Reserved.
-        </p>
-      </footer>
+            <div className="bg-black p-3 rounded">
+              Followers 0
+            </div>
+
+            <div className="bg-black p-3 rounded">
+              Views 0
+            </div>
+
+            <div className="bg-black p-3 rounded">
+              Monetization Pending
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800">
+        <div className="grid grid-cols-5 text-center py-3">
+          <div>🏠</div>
+          <div>🎬</div>
+          <div>➕</div>
+          <div>💬</div>
+          <div>👤</div>
+        </div>
+      </nav>
+
+      <div className="h-20" />
     </main>
   );
 }
