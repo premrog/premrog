@@ -1,5 +1,4 @@
 import BottomNav from "@/components/BottomNav";
-
 export default function ProfilePage() {
     return (
         <div className="bg-black text-white min-h-screen pb-20">

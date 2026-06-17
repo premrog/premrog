@@ -14,6 +14,7 @@ export default function HomePage() {
                         <div className="w-16 h-16 rounded-full bg-pink-500"></div>
                         <p className="text-xs mt-1">Story</p>
                     </div>
+                    
                 ))}
             </div>
 
@@ -29,8 +30,10 @@ export default function HomePage() {
                         <button>📤 Share</button>
                     </div>
                 </div>
-            </div>
+            </div> 
+            {/*.......*/}
+            <BottomNav />
         </div>
+       
     );
 }
-<BottomNav />
