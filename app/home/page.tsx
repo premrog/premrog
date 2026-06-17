@@ -1,3 +1,4 @@
+import BottomNav from "@/components/BottomNav";
 export default function HomePage() {
     return (
         <div className="min-h-screen bg-black text-white">
@@ -32,3 +33,4 @@ export default function HomePage() {
         </div>
     );
 }
+<BottomNav />
