@@ -1,6 +1,10 @@
+"use client";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+
 export default function ForgotPasswordPage() {
+    const router = useRouter();
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
 
@@ -15,9 +19,12 @@ export default function ForgotPasswordPage() {
                   className="w-full p-3 rounded bg-gray-900 mb-4"
               />
 
-              <button className="w-full bg-pink-600 p-3 rounded">
-                  Send Reset Link
-              </button>
+                <button
+                    onClick={() => router.push("/home")}
+                    className="w-full bg-pink-600 p-3 rounded-lg mt-4"
+                >
+                    Login
+                </button>
 
               <Link
                   href="/login"

@@ -1,6 +1,10 @@
+"use client";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+
 export default function SignupPage() {
+    const router = useRouter();
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
             <div className="w-full max-w-sm p-6">
@@ -30,7 +34,10 @@ export default function SignupPage() {
                     className="w-full p-3 rounded bg-gray-900 mb-4"
                 />
 
-                <button className="w-full bg-pink-600 p-3 rounded">
+                <button
+                    onClick={() => router.push("/login")}
+                    className="w-full bg-pink-600 p-3 rounded-lg mt-4"
+                >
                     Create Account
                 </button>
 

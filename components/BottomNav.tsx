@@ -9,7 +9,11 @@ export default function BottomNav() {
     const menus = [
         { name: "Home", href: "/home", icon: "🏠" },
         { name: "Reels", href: "/reels", icon: "🎬" },
+        { name: "Story", href: "/story", icon: "⭕" },
         { name: "Upload", href: "/upload", icon: "➕" },
+        { name: "Search", href: "/search", icon: "🔍" },
+        { name: "Notify", href: "/notifications", icon: "🔔" },
+        { name: "Wallet", href: "/wallet", icon: "💰" },
         { name: "Chat", href: "/chat", icon: "💬" },
         { name: "Profile", href: "/profile", icon: "👤" },
     ];
