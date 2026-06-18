@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StateProvider } from "@/lib/state";
 
 export const metadata: Metadata = {
   title: "Premrog",
@@ -13,7 +14,11 @@ export default function RootLayout({
   }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-black text-white selection:bg-pink-500 selection:text-white">
+        <StateProvider>
+          {children}
+        </StateProvider>
+      </body>
     </html>
   );
-}
+}

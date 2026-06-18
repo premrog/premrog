@@ -1,25 +1,18 @@
-export default function MessagesPage() {
-    return (
-        <div className="min-h-screen bg-black text-white">
-            <div className="p-4 border-b border-gray-800">
-                <h1 className="text-2xl font-bold">
-                    Messages
-                </h1>
-            </div>
+"use client";
 
-            <div className="space-y-2 p-4">
-                <div className="bg-gray-900 p-4 rounded">
-                    Rahul
-                </div>
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-                <div className="bg-gray-900 p-4 rounded">
-                    Priya
-                </div>
+export default function MessagesRedirectPage() {
+  const router = useRouter();
 
-                <div className="bg-gray-900 p-4 rounded">
-                    Amit
-                </div>
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    router.replace("/chat");
+  }, [router]);
+
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 }
