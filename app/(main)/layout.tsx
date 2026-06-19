@@ -6,7 +6,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-black text-white min-h-screen pb-20">
+    <div className="bg-[#FFF5F7] text-[#000000] min-h-screen pb-20">
       {children}
       <BottomNav />
     </div>

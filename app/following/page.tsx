@@ -7,8 +7,8 @@ export default function FollowingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-black text-white p-4">
-            <h1 className="text-3xl font-bold text-pink-500">
+        <div className="min-h-screen bg-[#FFF5F7] text-[#000000] p-4 font-sans">
+            <h1 className="text-3xl font-black text-pink-600">
                 Following
             </h1>
 
@@ -16,11 +16,11 @@ export default function FollowingPage() {
                 {users.map((user) => (
                     <div
                         key={user}
-                        className="bg-gray-900 p-4 rounded-lg flex justify-between"
+                        className="bg-white border border-pink-200 p-4 rounded-2xl flex justify-between items-center"
                     >
-                        <span>{user}</span>
+                        <span className="font-bold">{user}</span>
 
-                        <button className="bg-pink-600 px-4 py-1 rounded">
+                        <button className="bg-pink-600 hover:bg-pink-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition">
                             Following
                         </button>
                     </div>

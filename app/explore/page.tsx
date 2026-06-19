@@ -2,9 +2,9 @@ import UserCard from "@/components/UserCard";
 
 export default function ExplorePage() {
     return (
-        <div className="bg-black text-white min-h-screen p-4">
+        <div className="bg-[#FFF5F7] text-[#000000] min-h-screen p-4 font-sans">
 
-            <h1 className="text-3xl font-bold text-pink-500">
+            <h1 className="text-3xl font-black text-pink-600">
                 Explore
             </h1>
 

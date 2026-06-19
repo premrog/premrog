@@ -14,7 +14,7 @@ export default function RootLayout({
   }) {
   return (
     <html lang="en">
-      <body className="bg-black text-white selection:bg-pink-500 selection:text-white">
+      <body className="selection:bg-pink-200 selection:text-black">
         <StateProvider>
           {children}
         </StateProvider>

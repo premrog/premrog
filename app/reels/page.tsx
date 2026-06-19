@@ -2,29 +2,54 @@
 
 import React, { useState } from "react";
 import BottomNav from "@/components/BottomNav";
-import { useAppState } from "@/lib/state";
+import { useAppState, Post } from "@/lib/state";
 import { 
   Heart, 
   MessageCircle, 
-  Share2, 
-  Music, 
   Volume2, 
   VolumeX, 
   Play, 
-  Pause,
   CheckCircle,
-  Eye
+  Eye,
+  SkipForward,
+  Sparkles
 } from "lucide-react";
 
 export default function ReelsPage() {
   const { state, likePost, commentPost, toggleFollow } = useAppState();
   const [muted, setMuted] = useState(false);
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [activeReelIndex, setActiveReelIndex] = useState(0);
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState<string | null>(null);
 
-  const reels = state.posts.filter(p => p.type === "reel" && p.status === "active");
+  // Fetch all active reels
+  const activeReels = state.posts.filter(p => p.type === "reel" && p.status === "active");
+
+  // Construct combined Reels + Ad list
+  // Exactly 1 Video Ad automatically served after every 5 sequential Reels (every 6th item is an ad)
+  const combinedReelsList: Array<{ 
+    isAd: boolean; 
+    data: Post | { title: string; description: string; sponsorUrl: string; mediaUrl: string }; 
+    adId?: string; 
+  }> = [];
+  let reelCounter = 0;
+  
+  activeReels.forEach((reel) => {
+    combinedReelsList.push({ isAd: false, data: reel });
+    reelCounter++;
+    if (reelCounter % 5 === 0) {
+      combinedReelsList.push({ 
+        isAd: true, 
+        adId: `reel-ad-${reelCounter}`,
+        data: {
+          title: "Cola Brand Diwali Splash",
+          description: "Celebrate with carbonated fizz and grab up to 30% discounts! 🥤",
+          sponsorUrl: "www.cola-diwali-splash.com",
+          mediaUrl: "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4"
+        }
+      });
+    }
+  });
 
   const togglePlay = (id: string) => {
     if (playingId === id) {
@@ -41,10 +66,10 @@ export default function ReelsPage() {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen pb-20 select-none">
+    <div className="bg-[#FFF5F7] text-[#000000] min-h-screen pb-20 select-none font-sans relative">
       {/* Header overlay */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-        <h1 className="text-xl font-black tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <h1 className="text-xl font-black tracking-widest text-black drop-shadow-xs">
           REELS
         </h1>
         <span className="bg-pink-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase">
@@ -52,25 +77,85 @@ export default function ReelsPage() {
         </span>
       </div>
 
-      <div className="max-w-md mx-auto h-[calc(100vh-80px)] overflow-y-scroll snap-y snap-mandatory scrollbar-none relative">
-        {reels.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <FilmIcon className="w-16 h-16 text-gray-600 mb-4 animate-bounce" />
-            <h2 className="font-bold text-lg">No Reels Uploaded Yet</h2>
-            <p className="text-sm text-gray-500 mt-1">Upload a 1-minute reel for ₹1 in the Upload tab.</p>
+      <div className="max-w-md mx-auto h-[calc(100vh-80px)] overflow-y-scroll snap-y snap-mandatory scrollbar-none relative bg-black">
+        {combinedReelsList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-6 bg-[#FFF5F7]">
+            <FilmIcon className="w-16 h-16 text-pink-600 mb-4 animate-bounce" />
+            <h2 className="font-bold text-lg text-black">No Reels Uploaded Yet</h2>
+            <p className="text-sm text-pink-900 mt-1">Upload a 1-minute reel for ₹1 in the Upload tab.</p>
           </div>
         ) : (
-          reels.map((reel, index) => {
+          combinedReelsList.map((item, index) => {
+            if (item.isAd) {
+              // RENDER FULL-SCREEN VERTICAL INTERSTITIAL VIDEO AD
+              const ad = item.data as { title: string; description: string; sponsorUrl: string; mediaUrl: string };
+              return (
+                <div 
+                  key={item.adId} 
+                  className="h-full w-full snap-start relative flex flex-col justify-end pb-8 bg-gradient-to-b from-purple-950 to-indigo-950"
+                  style={{ height: "calc(100vh - 80px)" }}
+                >
+                  <video
+                    src={ad.mediaUrl}
+                    loop
+                    muted={muted}
+                    autoPlay
+                    className="absolute inset-0 z-0 w-full h-full object-cover opacity-60"
+                  />
+
+                  {/* Ad Header overlay */}
+                  <div className="absolute top-6 left-4 right-4 z-10 flex justify-between items-center">
+                    <span className="bg-pink-600 text-white text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-xl uppercase">
+                      Sponsored Ad
+                    </span>
+                    <span className="text-[10px] text-white bg-black/40 px-2.5 py-1 rounded-xl font-bold">
+                      75% Creator Ad Split Enabled
+                    </span>
+                  </div>
+
+                  {/* Skip button simulation */}
+                  <div className="absolute right-4 top-24 z-10">
+                    <button 
+                      onClick={() => alert("Ad dismissed. Scroll to resume Reels!")}
+                      className="bg-black/60 text-white border border-white/20 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-black transition"
+                    >
+                      <span>Skip Ad</span>
+                      <SkipForward className="w-3.5 h-3.5 text-pink-500" />
+                    </button>
+                  </div>
+
+                  {/* Bottom details overlay */}
+                  <div className="absolute left-4 bottom-12 right-20 z-10 text-white drop-shadow-md">
+                    <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
+                      {ad.title} <Sparkles className="w-4 h-4 text-yellow-400" />
+                    </h3>
+                    <p className="text-xs text-gray-200 mt-1 leading-relaxed">
+                      {ad.description}
+                    </p>
+                    <button 
+                      onClick={() => alert(`Redirecting to: ${ad.sponsorUrl}`)}
+                      className="mt-4 bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-md shadow-pink-500/20"
+                    >
+                      Visit Sponsor Site
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+
+            // RENDER STANDARD REEL CARD
+            const reel = item.data as Post;
+            if (!reel) return null;
             const isLiked = reel.likes.includes(state.user?.username || "");
             const isPlaying = playingId === reel.id;
 
             return (
               <div 
                 key={reel.id} 
-                className="h-full w-full snap-start relative flex flex-col justify-end pb-8"
+                className="h-full w-full snap-start relative flex flex-col justify-end pb-8 bg-black"
                 style={{ height: "calc(100vh - 80px)" }}
               >
-                {/* Video Player Mock */}
+                {/* Video Player */}
                 <div 
                   className="absolute inset-0 z-0 bg-gray-950 flex items-center justify-center cursor-pointer"
                   onClick={() => togglePlay(reel.id)}
@@ -114,7 +199,7 @@ export default function ReelsPage() {
                   {/* Likes */}
                   <button 
                     onClick={() => likePost(reel.id)}
-                    className="flex flex-col items-center text-white hover:scale-110 transition drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    className="flex flex-col items-center text-white hover:scale-110 transition drop-shadow-md"
                   >
                     <Heart className={`w-7 h-7 ${isLiked ? "text-pink-500 fill-pink-500" : ""}`} />
                     <span className="text-xs font-bold mt-1">{reel.likes.length}</span>
@@ -123,7 +208,7 @@ export default function ReelsPage() {
                   {/* Comments */}
                   <button 
                     onClick={() => setShowComments(showComments === reel.id ? null : reel.id)}
-                    className="flex flex-col items-center text-white hover:scale-110 transition drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    className="flex flex-col items-center text-white hover:scale-110 transition drop-shadow-md"
                   >
                     <MessageCircle className="w-7 h-7" />
                     <span className="text-xs font-bold mt-1">{reel.comments.length}</span>
@@ -134,18 +219,18 @@ export default function ReelsPage() {
                     onClick={(e) => { e.stopPropagation(); setMuted(!muted); }}
                     className="bg-black/50 p-2.5 rounded-full backdrop-blur-md border border-white/10"
                   >
-                    {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                    {muted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
                   </button>
 
                   {/* Views counter */}
-                  <div className="flex flex-col items-center text-gray-300 text-[10px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                  <div className="flex flex-col items-center text-gray-300 text-[10px] drop-shadow-md">
                     <Eye className="w-4 h-4" />
                     <span className="font-bold">{reel.views}</span>
                   </div>
                 </div>
 
                 {/* Bottom details overlay */}
-                <div className="absolute left-4 bottom-8 right-20 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                <div className="absolute left-4 bottom-8 right-20 z-10 drop-shadow-md">
                   <div className="flex items-center gap-1.5 mb-2">
                     <h3 className="font-bold text-sm text-white">@{reel.user}</h3>
                     {reel.user === "premrog_official" && <CheckCircle className="w-3.5 h-3.5 text-pink-500 fill-pink-500/20" />}
@@ -153,17 +238,11 @@ export default function ReelsPage() {
                   <p className="text-xs text-gray-200 line-clamp-2 leading-relaxed">
                     {reel.caption}
                   </p>
-                  
-                  {/* Music ticker */}
-                  <div className="flex items-center gap-1.5 mt-3 text-[11px] text-pink-400 font-medium">
-                    <Music className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "3s" }} />
-                    <span className="truncate">Original Audio - Premrog Music Library</span>
-                  </div>
                 </div>
 
                 {/* Inline comment panel */}
                 {showComments === reel.id && (
-                  <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/95 border-t border-white/10 rounded-t-3xl p-4 max-h-[50%] flex flex-col">
+                  <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/95 border-t border-pink-200/20 rounded-t-3xl p-4 max-h-[50%] flex flex-col">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-bold text-sm text-white">Comments ({reel.comments.length})</h4>
                       <button onClick={() => setShowComments(null)} className="text-gray-400 text-xs font-bold hover:text-white">✕</button>
@@ -184,14 +263,14 @@ export default function ReelsPage() {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Add dynamic comment..."
+                        placeholder="Add comment..."
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
                         className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-pink-500"
                       />
                       <button
                         onClick={() => handleAddComment(reel.id)}
-                        className="bg-pink-600 hover:bg-pink-500 px-4 py-2 rounded-xl text-xs font-bold transition"
+                        className="bg-pink-600 hover:bg-pink-500 px-4 py-2 rounded-xl text-xs font-bold transition text-white"
                       >
                         Send
                       </button>

@@ -38,16 +38,16 @@ const translations = {
     comment: "Comment",
     share: "Share",
     save: "Save",
-    adCooldown: "Ad Cooldown",
-    watchAd: "Watch Reward Ad (+1 Coin)",
+    adCooldown: "Bonus Cooldown",
+    watchAd: "Bonus (+1 Coin)",
     settings: "Settings",
     submit: "Submit",
     cancel: "Cancel",
     creatorAnalytics: "Creator Analytics",
     invalidViews: "Invalid Views Removed",
     fraudAlert: "Anti-Fraud Active",
-    callNativeAd: "Calling Banner Ad (Premrog Sponsor)",
-    chatNativeAd: "Chat Top Banner Ad",
+    callNativeAd: "Calling Banner (Premrog Sponsor)",
+    chatNativeAd: "Chat Top Banner",
   },
   hi: {
     appName: "प्रेमरोग",
@@ -83,20 +83,65 @@ const translations = {
     comment: "टिप्पणी",
     share: "शेयर",
     save: "सुरक्षित करें",
-    adCooldown: "विज्ञापन अंतराल",
-    watchAd: "इनाम विज्ञापन देखें (+1 सिक्का)",
+    adCooldown: "बोनस अंतराल",
+    watchAd: "बोनस (+1 सिक्का)",
     settings: "सेटिंग्स",
     submit: "जमा करें",
     cancel: "रद्द करें",
     creatorAnalytics: "क्रिएटर विश्लेषण",
     invalidViews: "अवैध व्यूज हटाए गए",
     fraudAlert: "धोखाधड़ी विरोधी सक्रिय",
-    callNativeAd: "कॉलिंग बैनर विज्ञापन (प्रेमरोग प्रायोजक)",
-    chatNativeAd: "चैट टॉप बैनर विज्ञापन",
+    callNativeAd: "कॉलिंग बैनर (प्रेमरोग प्रायोजक)",
+    chatNativeAd: "चैट टॉप बैनर",
+  },
+  es: {
+    appName: "PREMROG",
+    home: "Inicio",
+    reels: "Reels",
+    story: "Historia",
+    upload: "Subir",
+    search: "Buscar",
+    notifications: "Notificaciones",
+    wallet: "Billetera",
+    chat: "Chat",
+    profile: "Perfil",
+    creator: "Panel de Creador",
+    admin: "Súper Admin",
+    advertiser: "Anunciante",
+    legal: "Información Legal",
+    support: "Soporte",
+    login: "Iniciar sesión",
+    signup: "Registrarse",
+    logout: "Cerrar sesión",
+    coins: "Monedas",
+    cash: "Saldo de Caja",
+    earnings: "Ganancias",
+    recharge: "Recargar",
+    withdraw: "Retirar",
+    boost: "Impulsar Publicación",
+    autoRenew: "Auto-renovación",
+    follow: "Seguir",
+    following: "Siguiendo",
+    followers: "Seguidores",
+    unfollow: "Dejar de seguir",
+    like: "Me gusta",
+    comment: "Comentar",
+    share: "Compartir",
+    save: "Guardar",
+    adCooldown: "Enfriamiento del Bono",
+    watchAd: "Bono (+1 moneda)",
+    settings: "Ajustes",
+    submit: "Enviar",
+    cancel: "Cancelar",
+    creatorAnalytics: "Análisis de creador",
+    invalidViews: "Vistas inválidas eliminadas",
+    fraudAlert: "Antifraude activo",
+    callNativeAd: "Llamando banner (Patrocinador Premrog)",
+    chatNativeAd: "Banner superior de chat",
   }
 };
 
-export type Language = "en" | "hi";
+export type Language = "en" | "hi" | "es";
 
 export interface Message {
   id: string;
@@ -186,6 +231,12 @@ export interface UserProfile {
   isCreator: boolean;
   isSuspended: boolean;
   isBanned: boolean;
+  age?: number;
+  panCard?: string;
+  taxForm?: string;
+  taxStatus?: "none" | "pending" | "verified" | "rejected";
+  bankAccount?: string;
+  guardianPan?: string;
 }
 
 export interface AppState {
@@ -246,7 +297,7 @@ interface AppContextType {
   logout: () => void;
   updateProfile: (fields: Partial<UserProfile>) => void;
   toggleFollow: (username: string) => void;
-  rechargeWallet: (amount: number, method: string) => void;
+  rechargeWallet: (amount: number, method: string) => { success: boolean; instant: boolean; message: string };
   watchRewardAd: () => { success: boolean; message: string };
   uploadContent: (
     type: "photo" | "story" | "reel" | "video" | "movie",
@@ -297,6 +348,10 @@ const defaultInitialState: AppState = {
     isCreator: true,
     isSuspended: false,
     isBanned: false,
+    age: 26,
+    panCard: "ABCDE1234F",
+    taxStatus: "verified",
+    bankAccount: "rajesh@ybl",
   },
   coins: 120,
   cash: 350,
@@ -606,10 +661,13 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Wallet operations
-  const rechargeWallet = (amount: number, method: string) => {
-    if (!state.user) return;
+  const rechargeWallet = (amount: number, method: string): { success: boolean; instant: boolean; message: string } => {
+    if (!state.user) return { success: false, instant: false, message: "User not logged in." };
     const isIndia = state.user.country === "India"; 
+    
+    // Billing Gateway Sync Matrix Checks
+    const isInstant = method.includes("Google") || method.includes("Apple") || method.includes("IAP") || method.includes("Play");
+    
     let addedCoins = 0;
     let addedCash = 0;
 
@@ -623,6 +681,29 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
       addedCash = amount;
     }
 
+    if (!isInstant) {
+      // Web Sync Holds (PhonePe / PayPal): 24 to 48 Hours security holds ledger check
+      saveState({
+        ...state,
+        notifications: [
+          {
+            id: `noti-${Date.now()}`,
+            type: "wallet",
+            text: `Web Gate hold: ${isIndia ? '₹' : '$'}${amount} via ${method} is undergoing 24-48 Hours ledger sync checks.`,
+            timestamp: "Just now",
+            read: false
+          },
+          ...state.notifications
+        ]
+      });
+      return { 
+        success: true, 
+        instant: false, 
+        message: `Payment initiated successfully. Web portals (PhonePe/PayPal) enforce a 24 to 48 Hours security holds verification ledger sync.` 
+      };
+    }
+
+    // Mobile billing (Google Play / Apple Store): INSTANT Successful Credit
     const newCoins = state.coins + addedCoins;
     const newCash = state.cash + addedCash;
 
@@ -634,13 +715,19 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
         {
           id: `noti-${Date.now()}`,
           type: "wallet",
-          text: `Wallet recharged successfully. Added ${addedCoins > 0 ? `${addedCoins} Coins` : `${isIndia ? '₹' : '$'}${addedCash}`}`,
+          text: `Instant Recharge: Added ${addedCoins > 0 ? `${addedCoins} Coins` : `${isIndia ? '₹' : '$'}${addedCash}`} via Mobile Native SDK.`,
           timestamp: "Just now",
           read: false
         },
         ...state.notifications
       ]
     });
+
+    return { 
+      success: true, 
+      instant: true, 
+      message: `Recharge successful! Native App Billing (Google Play / Apple Pay IAP) processed instantly (तुरंत क्रेडिट).` 
+    };
   };
 
   const watchRewardAd = (): { success: boolean; message: string } => {
@@ -651,12 +738,12 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
         const remainingMin = Math.round((cooldownDate - now) / 60000);
         return {
           success: false,
-          message: `Reward ad on cooldown. Try again in ${remainingMin} minutes.`
+          message: `Bonus on cooldown. Try again in ${remainingMin} minutes.`
         };
       }
     }
 
-    const nextCooldown = new Date(now + 4 * 60 * 60 * 1000).toISOString(); // 4 hours
+    const nextCooldown = new Date(now + 3 * 60 * 60 * 1000).toISOString(); // exactly 3 hours
     saveState({
       ...state,
       coins: state.coins + 1,
@@ -665,7 +752,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
         {
           id: `noti-${Date.now()}`,
           type: "wallet",
-          text: "Watched reward ad: +1 Coin credited",
+          text: "Bonus claimed: +1 Coin credited",
           timestamp: "Just now",
           read: false
         },
@@ -697,30 +784,24 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
     if (type === "movie" && durationSeconds > 10800) return { success: false, message: "Movie exceeds maximum duration of 3 hours" };
 
     // Cost calculations
-    let chargeAmount = 0;
+    let actualCharge = 0;
     let chargeUnit: "Coins" | "Cash" = "Coins";
 
     if (type === "photo") {
-      chargeAmount = state.systemSettings.uploadCharges.photo;
+      actualCharge = 1;
       chargeUnit = "Coins";
     } else if (type === "story") {
-      chargeAmount = state.systemSettings.uploadCharges.story;
+      actualCharge = 2;
       chargeUnit = "Coins";
     } else if (type === "reel") {
-      chargeAmount = state.systemSettings.uploadCharges.reel;
+      actualCharge = isIndia ? 1 : 0.02;
       chargeUnit = "Cash";
     } else if (type === "video") {
-      chargeAmount = state.systemSettings.uploadCharges.video;
+      actualCharge = isIndia ? 5 : 0.07;
       chargeUnit = "Cash";
     } else if (type === "movie") {
-      chargeAmount = state.systemSettings.uploadCharges.movie;
+      actualCharge = isIndia ? 59 : 0.80;
       chargeUnit = "Cash";
-    }
-
-    let actualCharge = chargeAmount;
-    if (chargeUnit === "Cash" && !isIndia) {
-      actualCharge = chargeAmount / 80; // approximate $ equivalents
-      actualCharge = parseFloat(actualCharge.toFixed(2));
     }
 
     // Check balance
@@ -749,7 +830,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
       mediaUrl,
       duration: `${Math.round(durationSeconds)}s`,
       size: `${fileSizeMB.toFixed(1)} MB`,
-      cost: chargeAmount,
+      cost: actualCharge,
       costUnit: chargeUnit,
       validityDays,
       autoRenew,
@@ -1058,6 +1139,15 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
 
   const requestWithdrawal = (amount: number, method: string, details: string): { success: boolean; message: string } => {
     if (!state.user) return { success: false, message: "Not logged in" };
+    
+    // Identity Compliance Gate Check
+    if (state.user.taxStatus !== "verified") {
+      return { 
+        success: false, 
+        message: "Mandatory Tax Compliance review required! Submit your PAN Card (India) or local statutory tax forms (International) first." 
+      };
+    }
+
     const isIndia = state.user.country === "India";
     const minLimit = isIndia ? 1000 : 100;
     const currency = isIndia ? "INR" : "USD";
@@ -1066,7 +1156,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
       return { success: false, message: `Insufficient earnings balance. Available: ${isIndia ? '₹' : '$'}${state.earnings}` };
     }
     if (amount < minLimit) {
-      return { success: false, message: `Minimum withdrawal amount is ${isIndia ? '₹1000' : '$100'}` };
+      return { success: false, message: `Payout Threshold Bound Error: Minimum withdrawal requires ${isIndia ? '₹1,000' : '$100 USD'}` };
     }
 
     const newReq: Withdrawal = {
@@ -1088,7 +1178,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
         {
           id: `noti-${Date.now()}`,
           type: "earnings",
-          text: `Withdrawal request of ${isIndia ? '₹' : '$'}${amount} submitted successfully.`,
+          text: `Withdrawal of ${isIndia ? '₹' : '$'}${amount} submitted. Settled on next payout clearance date.`,
           timestamp: "Just now",
           read: false
         },
@@ -1096,7 +1186,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
       ]
     });
 
-    return { success: true, message: "Withdrawal request submitted!" };
+    return { success: true, message: "Withdrawal request submitted for compliance verification!" };
   };
 
   const approveWithdrawal = (id: string) => {

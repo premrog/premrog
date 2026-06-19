@@ -126,34 +126,34 @@ Our support desk is accessible under support.premrog@gmail.com.
   const currentPolicy = policies.find(p => p.id === activeTab) || policies[2];
 
   return (
-    <div className="bg-black text-white min-h-screen font-sans relative overflow-hidden max-w-md mx-auto border-x border-white/5">
+    <div className="bg-[#FFF5F7] text-[#000000] min-h-screen font-sans relative overflow-hidden max-w-md mx-auto border-x border-pink-200">
       {/* Glow effect */}
-      <div className="absolute top-0 right-1/4 w-[250px] h-[250px] bg-pink-900/10 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[250px] h-[250px] bg-pink-300/20 rounded-full blur-[90px] pointer-events-none" />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-black/85 backdrop-blur-md border-b border-white/10 p-4 flex items-center gap-3">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition">
+      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-pink-200 p-4 flex items-center gap-3">
+        <button onClick={() => router.back()} className="text-[#000000]/70 hover:text-pink-600 transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-md font-black tracking-wide bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-md font-black tracking-wide text-pink-600">
             LEGAL & POLICIES
           </h1>
-          <span className="text-[9px] text-gray-500 font-semibold block mt-0.5">Premrog Compliance Hub (V1.0)</span>
+          <span className="text-[9px] text-[#000000]/60 font-semibold block mt-0.5">Premrog Compliance Hub (V1.0)</span>
         </div>
       </header>
 
       <div className="p-4 flex gap-4 h-[calc(100vh-80px)]">
         {/* Left vertical tab selectors */}
-        <div className="w-[35%] overflow-y-auto space-y-1.5 border-r border-white/10 pr-2 scrollbar-none">
+        <div className="w-[35%] overflow-y-auto space-y-1.5 border-r border-pink-200 pr-2 scrollbar-none">
           {policies.map(p => (
             <button
               key={p.id}
               onClick={() => setActiveTab(p.id)}
               className={`w-full text-left text-[9px] font-bold py-2.5 px-3 rounded-xl transition-all border ${
                 activeTab === p.id
-                  ? "bg-pink-600 text-white border-pink-500"
-                  : "bg-white/5 border-transparent text-gray-400 hover:text-gray-200"
+                  ? "bg-pink-600 text-white border-pink-600"
+                  : "bg-white border-pink-200 text-[#000000] hover:bg-pink-50"
               }`}
             >
               {p.name}
@@ -163,23 +163,23 @@ Our support desk is accessible under support.premrog@gmail.com.
 
         {/* Right content view area */}
         <div className="w-[65%] overflow-y-auto px-1 select-text scrollbar-none">
-          <div className="prose prose-invert prose-xs text-xs space-y-4 leading-relaxed text-gray-300">
+          <div className="text-xs space-y-4 leading-relaxed text-[#000000]/80">
             {/* Simple manual render of markdown styling */}
             {currentPolicy.content.split("\n").map((line, idx) => {
               if (line.startsWith("# ")) {
-                return <h2 key={idx} className="text-sm font-black text-pink-500 pt-2 border-b border-white/5 pb-1 uppercase">{line.replace("# ", "")}</h2>;
+                return <h2 key={idx} className="text-sm font-black text-pink-600 pt-2 border-b border-pink-100 pb-1 uppercase">{line.replace("# ", "")}</h2>;
               }
               if (line.startsWith("## ")) {
-                return <h3 key={idx} className="text-xs font-bold text-white pt-1">{line.replace("## ", "")}</h3>;
+                return <h3 key={idx} className="text-xs font-bold text-black pt-1">{line.replace("## ", "")}</h3>;
               }
               if (line.startsWith("- ")) {
-                return <li key={idx} className="list-disc pl-2 ml-2 text-gray-400">{line.replace("- ", "")}</li>;
+                return <li key={idx} className="list-disc pl-2 ml-2 text-[#000000]/70">{line.replace("- ", "")}</li>;
               }
               if (line.trim().match(/^\d+\./)) {
-                return <p key={idx} className="pl-1 font-semibold text-gray-200">{line}</p>;
+                return <p key={idx} className="pl-1 font-semibold text-black">{line}</p>;
               }
               if (line.trim() === "") return null;
-              return <p key={idx} className="text-gray-400 text-[11px]">{line}</p>;
+              return <p key={idx} className="text-[#000000]/70 text-[11px]">{line}</p>;
             })}
           </div>
         </div>
